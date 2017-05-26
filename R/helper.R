@@ -7,6 +7,11 @@
 #
 ####################################################################################
 
+par.to.l <- function( l.var ){
+# Converts to par form from list
+  return(par.to(l.var$a,l.var$A,l.var$Sigma))
+}
+
 par.to <- function( a, A, Sigma ){
 # Converts to par form
   par <- c( a, A, Sigma[ lower.tri(Sigma,TRUE)])
@@ -17,7 +22,7 @@ par.from <- function(par, n.var, lags ){
 # Returns separate a, A, Sigma from par
   a <- par[1:n.var]
   A <- matrix( par[n.var + 1:(n.var^2*lags)], n.var, n.var * lags )
-  Sigma <- matrix(0,n.var,n.var)
+  Sigma <- matrix(NA,n.var,n.var)
   Sigma[lower.tri(Sigma,TRUE)] <- tail(par,n.var*(n.var+1)/2)
   Sigma <- pmax(Sigma, t(Sigma), na.rm=TRUE)
   return(list(a=a, A=A, Sigma=Sigma))
@@ -34,6 +39,26 @@ mu.calc <- function( a, A ){
   return(mu)
 }
 
+mu.calc.d <- function( a, A, Sigma ){
+# Computes the numerical derivative of the mean using the ordering of the long
+# form of the parameters.  Omits derivatives w.r.t Sigma terms.
+  n.var <- nrow(A)                                        # Number of variables
+  lags <- ncol(A) / n.var                                 # Number of lags
+  inc <- 1e-06                                            # Increment
+  par <- par.to( a, A, Sigma )                            # Long form of parameters
+  mu <- mu.calc(a,A)                                      # The base mean
+  out <- matrix( 0, (1+lags*n.var)*n.var, n.var )         # Initialize output
+
+  for( i in 1:((1+lags*n.var)*n.var) ){
+    par.inc <- par
+    par.inc[i] <- par.inc[i] + inc                        # The incremented parameters
+    l.par.inc <- par.from( par.inc, n.var, lags )         # As a list
+    mu.inc <- mu.calc( l.par.inc$a, l.par.inc$A )         # Recompute mu
+    out[i,] <- ( mu.inc - mu ) / inc                      # The derivative
+  }
+  return(out)
+}
+
 fitted.var <- function( Y, a, A ){
 # Computes the fitted values
   n.var <- nrow(A)                                      # Number of variables
@@ -46,5 +71,4 @@ fitted.var <- function( Y, a, A ){
   return(out)
 }
 
-# se.calc <-
 

@@ -3,7 +3,7 @@ context("Test the VAR likelihood function")
 
 test_that("Single lag likelihood function matches normal error likelihood", {
   a <- c(1,1)
-  A <- matrix( c(.5,.2,.4,.9), 2, 2)
+  A <- matrix( c(.5,.2,.1,.7), 2, 2)
       # VAR coefficients
   mu <- solve( diag(2) - A, a )
       # The unconditional average
@@ -18,12 +18,16 @@ test_that("Single lag likelihood function matches normal error likelihood", {
   Y <- var_sim_e( a, A, y0, e )
       # The simulation
   l.R <- - sum( dmvnorm( t(e), rep(0,2), Sigma, log=TRUE ) ) / ncol(e)
-      # The likelihood of the errors
+      # The likelihood of the errors.  Need subtract #lags * #vars
   par <- c( a, A, Sigma[lower.tri(Sigma,TRUE)] )
       # The parameters
   l <- var_lhood( Y, par, print_level = 0 )
       # Compute the likelihood
+  l.d <- var_lhood_grad( Y, par )
+  l.d.n <- var_lhood_grad_numeric( Y, par )
+      # The numerc and analytic gradients
   expect_equal( l, l.R )
+  expect_true( mean( abs( l.d - l.d.n ) ) < 1e-05 )
 })
 
 test_that("Two lag likelihood function matches normal error likelihood", {
@@ -43,12 +47,16 @@ test_that("Two lag likelihood function matches normal error likelihood", {
   Y <- var_sim_e( a, A, y0, e )
       # The simulation
   l.R <- - sum( dmvnorm( t(e), rep(0,2), Sigma, log=TRUE ) ) / ncol(e)
-      # The likelihood of the errors
+      # The likelihood of the errors.  Need subtract #lags * #vars
   par <- c( a, A, Sigma[lower.tri(Sigma,TRUE)] )
       # The parameters
   l <- var_lhood( Y, par, 2, print_level = 0 )
       # Compute the likelihood
+  l.d <- var_lhood_grad( Y, par, 2 )
+  l.d.n <- var_lhood_grad_numeric( Y, par, 2 )
+      # The numerc and analytic gradients
   expect_equal( l, l.R )
+  expect_true( mean( abs( l.d - l.d.n ) ) < 1e-05 )
 })
 
 ### To add: Test of numeric gradient

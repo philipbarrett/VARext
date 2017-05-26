@@ -7,8 +7,6 @@
 #
 ####################################################################################
 
-## To do: helper function that converts a, A, Sigma to par (and back)
-
 var.ols <- function( Y, lags=1 ){
 # Computes the VAR estimation via OLS
   n.var <- nrow(Y)
@@ -32,14 +30,17 @@ var.mle.est <- function( Y, lags=1, par=NULL ){
   }
       # Fill in initial pramaeters if required
   obj_fn <- function(x) var_lhood( Y, x, lags )               # The objective function
-  opts <- list(algorithm="NLOPT_LN_COBYLA", xtol_abs=1e-10,
-               xtol_rel=1e-10, maxeval=500 )                  # The options for nlopt
-  opt <- nloptr( par, obj_fn, opts=opts )                     # The numerical optimum
-  grad <- var_lhood_grad_numeric( Y, opt$solution, lags )     # Evaluate the derivative
+  grad_fn <- function(x) var_lhood_grad( Y, x, lags )         # The derivative function
+  opts <- list(algorithm="NLOPT_LD_SLSQP", xtol_abs=1e-8,
+               xtol_rel=1e-8, maxeval=50000 )                 # The options for nlopt
+  opt <- nloptr( par, obj_fn, grad_fn, opts=opts )            # The numerical optimum
+  grad <- var_lhood_grad( Y, opt$solution, lags )             # Evaluate the derivative
   out <- par.from( opt$solution, nrow(Y), lags )              # Convert to a, A, Sigma form
   out$lhood <- obj_fn(opt$solution)                           # Return the likelihood
   out$grad <- grad                                            # Return the gradient too
   out$mu <- mu.calc( out$a, out$A )                           # The long run mean
+  out$status <- opt$status
+  out$message <- opt$message
   return(out)
 }
 
@@ -58,10 +59,14 @@ var.mle.rest <- function( Y, g, lags=1, par=NULL, ... ){
   }
       # Fill in initial pramaeters if required
   obj_fn <- function(x) var_lhood( Y, x, lags )               # The objective function
+  grad_fn <- function(x) var_lhood_grad( Y, x, lags )         # The derivative function
   constraint_fn <- function(x) g( x, lags, ... )
-  opts <- list(algorithm="NLOPT_LN_COBYLA", xtol_abs=1e-10,
-               xtol_rel=1e-10, maxeval=5000 )                  # The options for nlopt
-  opt <- nloptr( par, obj_fn, eval_g_ineq = constraint_fn, opts=opts )
+  constraint_grad_fn <- function(x) g.deriv.par( g, x, lags=lags, ... )
+  opts <- list(algorithm="NLOPT_LD_SLSQP", xtol_abs=1e-8,
+               xtol_rel=1e-8, maxeval=50000 )                  # The options for nlopt
+  opt <- nloptr( par, obj_fn, grad_fn,
+                 eval_g_ineq = constraint_fn, eval_jac_g_ineq = constraint_grad_fn,
+                 opts=opts )
       # The numerical optimum
   grad <- var_lhood_grad_numeric( Y, opt$solution, lags )     # Evaluate the derivative
   out <- par.from( opt$solution, nrow(Y), lags )              # Convert to a, A, Sigma form
@@ -69,6 +74,8 @@ var.mle.rest <- function( Y, g, lags=1, par=NULL, ... ){
   out$grad <- grad                                            # Return the gradient too
   out$constraint <- constraint_fn( opt$solution )              # And the constraint value
   out$mu <- mu.calc( out$a, out$A )                           # The long run mean
+  out$status <- opt$status
+  out$message <- opt$message
   return(out)
 }
 

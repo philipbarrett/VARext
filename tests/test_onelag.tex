@@ -1,0 +1,28 @@
+\begin{table}[htbp] 
+	\centering 
+	\begin{tabular}{@{\extracolsep{4pt}}lcccccc@{}}		\hline\hline
+		 		 & \multicolumn{2}{c}{OLS Newey-West} &\multicolumn{2}{c}{MLE} &\multicolumn{2}{c}{Restricted MLE} \\ 
+ 		 & Y1 	 & Y2 	 & Y1 	 & Y2 	 & Y1 	 & Y2\\\cline{2-3}\cline{4-5}\cline{6-7}
+\rule{0pt}{4ex} 
+ \emph{Coefficients} 	  		 & 		 & 		 & 		 & 		 & 		 &\\ 
+\quad Constant 	 & 0.63 	 & 2.2 	 & 0.63 	 & 2.2 	 & 0.74 	 & 2.05	 \\ 
+ 		 & (0.541) 	 & (0.276) 	 & (0.603) 	 & (0.331) 	 & (0.604) 	 & (0.333) 	 \\ 
+\quad Mean 	 & -0.74 	 & 6.51 	 & -0.74 	 & 6.51 	 & -0.62 	 & 6.38	 \\ 
+ 		 & (0.12) 	 & (0.119) 	 & (0.122) 	 & (0.121) 	 & (0.128) 	 & (0.129) 	 \\ 
+\quad Y1 (-1) 	 &0.5 	 & 0.14 	 & 0.5 	 & 0.14 	 & 0.51 	 & 0.13	 \\ 
+ 		 & (0.06) 	 & (0.032) 	 & (0.063) 	 & (0.035) 	 & (0.063) 	 & (0.035) 	 \\ 
+\quad Y2 (-1) 	 &-0.15 	 & 0.68 	 & -0.15 	 & 0.68 	 & -0.16 	 & 0.69	 \\ 
+ 		 & (0.083) 	 & (0.042) 	 & (0.091) 	 & (0.05) 	 & (0.091) 	 & (0.05) 	 \\ 
+\rule{0pt}{4ex} \emph{Innovation covariance}  	 & 	 & 	 & 	 & 	 & 	 &\\ 
+\quad Y1 	 &0.91 	 &  	 & 0.91 	 &  	 & 0.91 	 & 	 \\ 
+ 		 &  	 &  	 & (0.092) 	 &  	 & (0.093) 	 &  	 \\ 
+\quad Y2 	 &0.05 	 & 0.27 	 & 0.05 	 & 0.27 	 & 0.05 	 & 0.28	 \\ 
+ 		 &  	 &  	 & (0.036) 	 & (0.028) 	 & (0.037) 	 & (0.029) 	 \\ 
+ \hline \rule{0pt}{4ex} 
+  Log likelihood 	 &\multicolumn{2}{c}{426.8} 	 & \multicolumn{2}{c}{426.8} 	 & \multicolumn{2}{c}{428.2}\\ 
+
+ \hline 	\end{tabular}		\caption{ONe-lag test VAR. In restricted MLE, mean difference is one
+           larger than the OLS estimate}
+		\label{tab:onelag}
+
+\end{table}

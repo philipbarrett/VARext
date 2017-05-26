@@ -136,3 +136,42 @@ err.plot <- function( sim,  lags=1, l.var=NULL, x.vals=NULL, smooth=TRUE, n.pds=
   }
   par(mfrow=c(1,1))
 }
+
+lr.wald.plot <- function( l.mle.u, v.mle, g, v.theta, offset=0,
+                          p.vals=c(.9, .95, .975, .99, .995 ), ... ){
+# Plots the Wald and LR test as a function of a constraint defined by theta
+  v.lhood.t <- v.wald.t <- NULL
+  n.var <- length(l.mle.u$a)
+  lags <- ncol( l.mle.u$A ) / n.var
+      # Problem dimensions
+  lhood.u <- var_lhood_N( sim, par.to.l(l.var.est.mle), lags )
+      # The unrestricted likelihood
+  l.mle.c <- l.mle.u
+      # Initialize constrained MLE at unconstrained
+  crit.vals <- qchisq( p.vals, 1 )
+      # The critical values: Only allow restrictions to vary in one dimension
+
+  for( thet in v.theta ){
+    v.wald.t <- c(v.wald.t, wald.stat( l.mle.u, v.mle, g, lags=lags,
+                                       n.var=n.var, theta=thet-offset, ... )$W )
+    l.mle.c <- var.mle.rest( sim, g, lags, par=par.to.l(l.mle.c), theta=thet-offset )
+    lhood.c <- var_lhood_N( sim, par.to.l(l.mle.c), lags )
+    v.lhood.t <- c( v.lhood.t, 2 * ( lhood.c - lhood.u ) )
+        # The likelihood ratio test
+  }
+
+  plot( v.theta, v.wald.t, type='l', lwd=2, col='blue',
+        xlab=expression(theta), ylab='Test statistic' )
+  lines( v.theta, v.lhood.t, lwd=2, col='red' )
+  abline(h=crit.vals, lty=2)
+  text( .8*max(v.theta), crit.vals, paste0( 'p-value = ', p.vals ), pos = 3,
+        offset=0.1, adj=c(0,0)  )
+  legend( 'topleft', c('Wald', 'Likelihood ratio'), col=c('blue', 'red'), lwd=2, bty='n')
+
+}
+
+
+
+
+
+

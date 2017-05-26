@@ -6,6 +6,20 @@
 
 using namespace Rcpp;
 
+// var_lhood_N
+double var_lhood_N(arma::mat Y, arma::vec par, int lags, int print_level);
+RcppExport SEXP VARext_var_lhood_N(SEXP YSEXP, SEXP parSEXP, SEXP lagsSEXP, SEXP print_levelSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type par(parSEXP);
+    Rcpp::traits::input_parameter< int >::type lags(lagsSEXP);
+    Rcpp::traits::input_parameter< int >::type print_level(print_levelSEXP);
+    rcpp_result_gen = Rcpp::wrap(var_lhood_N(Y, par, lags, print_level));
+    return rcpp_result_gen;
+END_RCPP
+}
 // var_lhood
 double var_lhood(arma::mat Y, arma::vec par, int lags, int print_level);
 RcppExport SEXP VARext_var_lhood(SEXP YSEXP, SEXP parSEXP, SEXP lagsSEXP, SEXP print_levelSEXP) {
@@ -20,6 +34,34 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// var_lhood_grad
+arma::vec var_lhood_grad(arma::mat Y, arma::vec par, int lags, int print_level);
+RcppExport SEXP VARext_var_lhood_grad(SEXP YSEXP, SEXP parSEXP, SEXP lagsSEXP, SEXP print_levelSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type par(parSEXP);
+    Rcpp::traits::input_parameter< int >::type lags(lagsSEXP);
+    Rcpp::traits::input_parameter< int >::type print_level(print_levelSEXP);
+    rcpp_result_gen = Rcpp::wrap(var_lhood_grad(Y, par, lags, print_level));
+    return rcpp_result_gen;
+END_RCPP
+}
+// var_lhood_grad_vcv
+arma::mat var_lhood_grad_vcv(arma::mat Y, arma::vec par, int lags, int print_level);
+RcppExport SEXP VARext_var_lhood_grad_vcv(SEXP YSEXP, SEXP parSEXP, SEXP lagsSEXP, SEXP print_levelSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type par(parSEXP);
+    Rcpp::traits::input_parameter< int >::type lags(lagsSEXP);
+    Rcpp::traits::input_parameter< int >::type print_level(print_levelSEXP);
+    rcpp_result_gen = Rcpp::wrap(var_lhood_grad_vcv(Y, par, lags, print_level));
+    return rcpp_result_gen;
+END_RCPP
+}
 // var_lhood_grad_numeric
 arma::vec var_lhood_grad_numeric(arma::mat Y, arma::vec par, int lags, int print_level);
 RcppExport SEXP VARext_var_lhood_grad_numeric(SEXP YSEXP, SEXP parSEXP, SEXP lagsSEXP, SEXP print_levelSEXP) {
@@ -31,6 +73,20 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type lags(lagsSEXP);
     Rcpp::traits::input_parameter< int >::type print_level(print_levelSEXP);
     rcpp_result_gen = Rcpp::wrap(var_lhood_grad_numeric(Y, par, lags, print_level));
+    return rcpp_result_gen;
+END_RCPP
+}
+// var_lhood_hessian_numeric
+arma::mat var_lhood_hessian_numeric(arma::mat Y, arma::vec par, int lags, int print_level);
+RcppExport SEXP VARext_var_lhood_hessian_numeric(SEXP YSEXP, SEXP parSEXP, SEXP lagsSEXP, SEXP print_levelSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::mat >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type par(parSEXP);
+    Rcpp::traits::input_parameter< int >::type lags(lagsSEXP);
+    Rcpp::traits::input_parameter< int >::type print_level(print_levelSEXP);
+    rcpp_result_gen = Rcpp::wrap(var_lhood_hessian_numeric(Y, par, lags, print_level));
     return rcpp_result_gen;
 END_RCPP
 }

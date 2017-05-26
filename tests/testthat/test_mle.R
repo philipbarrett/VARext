@@ -46,16 +46,22 @@ test_that("Single lag MLE estimation is accurate", {
   y0 <- matrix( mu, nrow=2, ncol=1 )
       # Initial value of y
   set.seed(42)
-  sim <- var_sim( a, A, y0, Sigma, 200 )
+  sim <- var_sim( a, A, y0, Sigma, 500 )
       # Create the simulation
   rownames(sim) <- c('y1','y2')
   l.var <- var.ols( sim )
       # The list of the outputs
   l.mle <- var.mle.est(sim)
       # The MLE estimate
-  expect_true( mean(abs( l.var$a - l.mle$a )) < 2e-04 )
-  expect_true( mean(abs( l.var$A - l.mle$A )) < 1e-04 )
-  expect_true( mean(abs( l.var$Sigma * 199 / 200 - l.mle$Sigma )) < 3e-03 )
+  I <- var_lhood_grad_vcv( sim, par.to.l(l.mle) )
+      # The variance of the derivative
+  E.H <- var_lhood_hessian_numeric( sim, par.to.l(l.mle) )
+      # The expected 2nd derivative
+  #### THESE SHOULD BE EQUAL BUT ARE NOT. WHY? ####
+  #### If we up the number of simulations to 1e7 then they are (more-or-less) ###
+  expect_true( mean(abs( l.var$a - l.mle$a )) < 2e-09 )
+  expect_true( mean(abs( l.var$A - l.mle$A )) < 1e-09 )
+  expect_true( mean(abs( l.var$Sigma * 199 / 200 - l.mle$Sigma )) < 1e-07 )
       # NB: The OLS vs MLE Sigmas are different due to a degrees of freedom
       # adjustment.
 })
