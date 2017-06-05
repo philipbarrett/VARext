@@ -54,3 +54,42 @@ arma::mat var_sim( arma::vec a, arma::mat A, arma::mat y0, arma::mat Sigma, int 
   mat e = var_e( Sigma, n_pds ) ;           // The errors
   return var_sim_e( a, A, y0, e ) ;
 }
+
+// [[Rcpp::export]]
+arma::vec markov_sim( const int n, const NumericMatrix M, const int s0,
+                      const int n_s ){
+  // Fast Markov simulation
+
+  NumericVector out(n) ;
+  out(0) = s0 ;
+  // Initialize output
+  NumericMatrix sum_M( n_s, n_s ) ;
+  // The row sum of M
+  for( int i=0 ; i < n_s ; i++ ){
+    sum_M( i, 0 ) = M( i , 0 ) ;
+    // The first column
+    for( int j=1 ; j < n_s ; j++ ){
+      sum_M( i, j ) = sum_M( i, j - 1 ) + M( i , j ) ;
+    }
+  } // Create the row sum of M
+
+  NumericVector shks = runif( n ) ;
+  // The vector of random shocks on [0,1]
+  int this_s = 0 ;
+
+  for( int i = 1 ; i < n ; i++ ){
+    this_s = 0 ;
+    // Initialize counters
+    while( shks(i) > sum_M( out(i-1), this_s ) ){
+      this_s++ ;
+    }
+    out( i ) = this_s ;
+  }
+
+  vec out_arma = zeros(n) ;
+  for ( int i = 0 ; i < n ; i++ )
+    out_arma(i) = out(i) ;
+  // Convert to arma type
+
+  return out_arma ;
+}

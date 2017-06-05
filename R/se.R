@@ -46,17 +46,18 @@ var.ols.se <- function( Y, lags=1 ){
   return( list( ols=ols.var[idx,idx], ols.nw=ols.var.nw[idx,idx] ) )
 }
 
-var.mle.se <- function( Y, l.var ){
+var.mle.se <- function( Y, l.var, cond=TRUE, ineff=FALSE ){
 # Computes the variance of the estimators for the MLE from the numerical Hessian
 # of the likelihood
-  par <- par.to( l.var$a, l.var$A, l.var$Sigma )              # Convert to par format
-  n.free <- ncol(Y) - length(par)                             # Degrees of freedom
-  lags <- ncol( l.var$A ) / nrow( l.var$A )                   # Number of lags
-  I <- var_lhood_grad_vcv(sim, par, lags )                    # The information matrix
-  E.H <- var_lhood_hessian_numeric(sim, par, lags )                   # The expected Hessian
-  # return( E.H %*% solve(I) %*% E.H )
-      # If I = E.H then this should be what we return.  But it is not.  Whai!?
-  return( solve(E.H) / n.free )
+  par <- par.to( l.var$a, l.var$A, l.var$Sigma )                # Convert to par format
+  n.free <- ncol(Y) - length(par)                               # Degrees of freedom
+  lags <- ncol( l.var$A ) / nrow( l.var$A )                     # Number of lags
+  I <- var_lhood_grad_vcv(sim, par, lags, cond=cond )           # The information matrix
+  E.H <- var_lhood_hessian_numeric(sim, par, lags, cond=cond )  # The expected Hessian
+  E.H.i <- solve( ( E.H + t(E.H) ) / 2)                         # Regularized expected Hessian
+  if(ineff) return( E.H.i %*% I %*% E.H.i / n.free )
+      # If we assume efficiency then these two are the same.
+  return( E.H.i / n.free )
 }
 
 ##### NOT USED #####

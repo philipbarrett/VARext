@@ -1,27 +1,27 @@
 \begin{table}[htbp] 
 	\centering 
-	\begin{tabular}{@{\extracolsep{4pt}}lcccccc@{}}		\hline\hline
-		 		 & \multicolumn{2}{c}{OLS Newey-West} &\multicolumn{2}{c}{MLE} &\multicolumn{2}{c}{Restricted MLE} \\ 
- 		 & Y1 	 & Y2 	 & Y1 	 & Y2 	 & Y1 	 & Y2\\\cline{2-3}\cline{4-5}\cline{6-7}
+	\begin{tabular}{@{\extracolsep{4pt}}lcccccccccc@{}}		\hline\hline
+		 		 & \multicolumn{2}{c}{OLS Newey-West} &\multicolumn{2}{c}{MLE} &\multicolumn{2}{c}{MLE w/o enfficiency} &\multicolumn{2}{c}{Restricted MLE} &\multicolumn{2}{c}{Restricted UMLE} \\ 
+ 		 & Y1 	 & Y2 	 & Y1 	 & Y2 	 & Y1 	 & Y2 	 & Y1 	 & Y2 	 & Y1 	 & Y2\\\cline{2-3}\cline{4-5}\cline{6-7}\cline{8-9}\cline{10-11}
 \rule{0pt}{4ex} 
- \emph{Coefficients} 	  		 & 		 & 		 & 		 & 		 & 		 &\\ 
-\quad Constant 	 & 0.63 	 & 2.2 	 & 0.63 	 & 2.2 	 & 0.74 	 & 2.05	 \\ 
- 		 & (0.541) 	 & (0.276) 	 & (0.603) 	 & (0.331) 	 & (0.604) 	 & (0.333) 	 \\ 
-\quad Mean 	 & -0.74 	 & 6.51 	 & -0.74 	 & 6.51 	 & -0.62 	 & 6.38	 \\ 
- 		 & (0.12) 	 & (0.119) 	 & (0.122) 	 & (0.121) 	 & (0.128) 	 & (0.129) 	 \\ 
-\quad Y1 (-1) 	 &0.5 	 & 0.14 	 & 0.5 	 & 0.14 	 & 0.51 	 & 0.13	 \\ 
- 		 & (0.06) 	 & (0.032) 	 & (0.063) 	 & (0.035) 	 & (0.063) 	 & (0.035) 	 \\ 
-\quad Y2 (-1) 	 &-0.15 	 & 0.68 	 & -0.15 	 & 0.68 	 & -0.16 	 & 0.69	 \\ 
- 		 & (0.083) 	 & (0.042) 	 & (0.091) 	 & (0.05) 	 & (0.091) 	 & (0.05) 	 \\ 
-\rule{0pt}{4ex} \emph{Innovation covariance}  	 & 	 & 	 & 	 & 	 & 	 &\\ 
-\quad Y1 	 &0.91 	 &  	 & 0.91 	 &  	 & 0.91 	 & 	 \\ 
- 		 &  	 &  	 & (0.092) 	 &  	 & (0.093) 	 &  	 \\ 
-\quad Y2 	 &0.05 	 & 0.27 	 & 0.05 	 & 0.27 	 & 0.05 	 & 0.28	 \\ 
- 		 &  	 &  	 & (0.036) 	 & (0.028) 	 & (0.037) 	 & (0.029) 	 \\ 
+ \emph{Coefficients} 	  		 & 		 & 		 & 		 & 		 & 		 & 		 & 		 & 		 & 		 &\\ 
+\quad Constant 	 & 1.68 	 & 2.15 	 & 1.68 	 & 2.15 	 & 1.68 	 & 2.15 	 & 1.74 	 & 0.4 	 & 1.94 	 & 0.46	 \\ 
+ 		 & (0.707) 	 & (0.397) 	 & (0.7) 	 & (0.337) 	 & (0.721) 	 & (0.405) 	 & (0.748) 	 & (0.426) 	 & (0.772) 	 & (0.047) 	 \\ 
+\quad Mean 	 & -0.55 	 & 6.59 	 & -0.55 	 & 6.59 	 & -0.55 	 & 6.59 	 & 0.29 	 & 5.43 	 & 0.36 	 & 5.5	 \\ 
+ 		 & (0.163) 	 & (0.113) 	 & (0.167) 	 & (0.115) 	 & (0.167) 	 & (0.116) 	 & (0.739) 	 & (0.989) 	 & (0.684) 	 & (NaN) 	 \\ 
+\quad Y1 (-1) 	 &0.58 	 & 0.1 	 & 0.58 	 & 0.1 	 & 0.58 	 & 0.1 	 & 0.59 	 & 0.04 	 & 0.59 	 & 0.03	 \\ 
+ 		 & (0.063) 	 & (0.029) 	 & (0.058) 	 & (0.028) 	 & (0.064) 	 & (0.03) 	 & (0.059) 	 & (0.031) 	 & (0.066) 	 & (0.029) 	 \\ 
+\quad Y2 (-1) 	 &-0.29 	 & 0.68 	 & -0.29 	 & 0.68 	 & -0.29 	 & 0.68 	 & -0.3 	 & 0.92 	 & -0.33 	 & 0.91	 \\ 
+ 		 & (0.105) 	 & (0.058) 	 & (0.105) 	 & (0.051) 	 & (0.107) 	 & (0.06) 	 & (0.111) 	 & (0.063) 	 & (0.113) 	 & (0.018) 	 \\ 
+\rule{0pt}{4ex} \emph{Innovation covariance}  	 & 	 & 	 & 	 & 	 & 	 & 	 & 	 & 	 & 	 &\\ 
+\quad Y1 	 &1.24 	 &  	 & 1.23 	 &  	 & 1.23 	 &  	 & 1.23 	 &  	 & 1.23 	 & 	 \\ 
+ 		 &  	 &  	 & (0.125) 	 &  	 & (0.12) 	 &  	 & (0.125) 	 &  	 & (0.124) 	 &  	 \\ 
+\quad Y2 	 &0.05 	 & 0.29 	 & 0.05 	 & 0.29 	 & 0.05 	 & 0.29 	 & 0.05 	 & 0.34 	 & 0.04 	 & 0.34	 \\ 
+ 		 &  	 &  	 & (0.043) 	 & (0.029) 	 & (0.047) 	 & (0.032) 	 & (0.051) 	 & (0.042) 	 & (0.058) 	 & (0.043) 	 \\ 
  \hline \rule{0pt}{4ex} 
-  Log likelihood 	 &\multicolumn{2}{c}{426.8} 	 & \multicolumn{2}{c}{426.8} 	 & \multicolumn{2}{c}{428.2}\\ 
+  Log likelihood 	 &\multicolumn{2}{c}{462} 	 & \multicolumn{2}{c}{462} 	 & \multicolumn{2}{c}{462} 	 & \multicolumn{2}{c}{479.3} 	 & \multicolumn{2}{c}{482.1}\\ 
 
- \hline 	\end{tabular}		\caption{ONe-lag test VAR. In restricted MLE, mean difference is one
+ \hline 	\end{tabular}		\caption{One-lag test VAR. In restricted MLE, mean difference is one
            larger than the OLS estimate}
 		\label{tab:onelag}
 

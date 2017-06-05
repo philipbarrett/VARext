@@ -61,7 +61,7 @@ test_that("Single lag MLE estimation is accurate", {
   #### If we up the number of simulations to 1e7 then they are (more-or-less) ###
   expect_true( mean(abs( l.var$a - l.mle$a )) < 2e-09 )
   expect_true( mean(abs( l.var$A - l.mle$A )) < 1e-09 )
-  expect_true( mean(abs( l.var$Sigma * 199 / 200 - l.mle$Sigma )) < 1e-07 )
+  expect_true( mean(abs( l.var$Sigma * 499 / 500 - l.mle$Sigma )) < 1e-07 )
       # NB: The OLS vs MLE Sigmas are different due to a degrees of freedom
       # adjustment.
 })

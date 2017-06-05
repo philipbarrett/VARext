@@ -71,7 +71,7 @@ irf.plot <- function( l.var, y0=NULL, n.pds=40, shk.sd=1, relative=TRUE, varname
             type='l', ylab=ylab, xlab=xlab )
       lines( x.vals, irf$mean[j,] + irf$sd[j,], lty=2, col='red' )
       lines( x.vals, irf$mean[j,] - irf$sd[j,], lty=2, col='red' )
-      if(relative) abline(h=0,lty=2) else abline(h=mu[j],lty=2)
+      if(relative) lines( x.vals, 0 * x.vals, lty=2 ) else lines( x.vals, rep(mu[j],length(x.vals)), lty=2 )
     }
   }
   par(mfcol=c(1,1))
@@ -137,36 +137,55 @@ err.plot <- function( sim,  lags=1, l.var=NULL, x.vals=NULL, smooth=TRUE, n.pds=
   par(mfrow=c(1,1))
 }
 
-lr.wald.plot <- function( l.mle.u, v.mle, g, v.theta, offset=0,
+lr.wald.plot <- function( sim, lags, g, v.theta, offset=0, xlab=NULL,
                           p.vals=c(.9, .95, .975, .99, .995 ), ... ){
 # Plots the Wald and LR test as a function of a constraint defined by theta
-  v.lhood.t <- v.wald.t <- NULL
-  n.var <- length(l.mle.u$a)
-  lags <- ncol( l.mle.u$A ) / n.var
+  n.var <- nrow(sim)
       # Problem dimensions
+  l.mle <- var.mle.est( sim, lags )
+  l.mle.uc <- var.mle.est( sim, lags, cond=FALSE )
+      # Unconstrained estimates, conditional and unconditional
+  v.mle <- var.mle.se( sim, l.mle )
+  v.mle.uc <- var.mle.se( sim, l.mle.uc, cond=FALSE )
+      # Local variances: SHOULD INCLUDE COND SOMEHOW
   lhood.u <- var_lhood_N( sim, par.to.l(l.var.est.mle), lags )
-      # The unrestricted likelihood
-  l.mle.c <- l.mle.u
+  lhood.u.uc <- var_lhood_N( sim, par.to.l(l.mle.uc), lags, cond=FALSE )
+      # The unrestricted likelihoods (conditioanl and unconditional)
+  l.mle.uc.c <- l.mle.c <- l.mle
       # Initialize constrained MLE at unconstrained
   crit.vals <- qchisq( p.vals, 1 )
       # The critical values: Only allow restrictions to vary in one dimension
+  v.lhood.uc <- v.lhood.t <- v.wald.uc <- v.wald.t <- NULL
 
   for( thet in v.theta ){
-    v.wald.t <- c(v.wald.t, wald.stat( l.mle.u, v.mle, g, lags=lags,
+    v.wald.t <- c(v.wald.t, wald.stat( l.mle, v.mle, g, lags=lags,
+                                       n.var=n.var, theta=thet-offset, ... )$W )
+    v.wald.uc <- c(v.wald.uc, wald.stat( l.mle.uc, v.mle.uc, g, lags=lags,
                                        n.var=n.var, theta=thet-offset, ... )$W )
     l.mle.c <- var.mle.rest( sim, g, lags, par=par.to.l(l.mle.c), theta=thet-offset )
-    lhood.c <- var_lhood_N( sim, par.to.l(l.mle.c), lags )
+    lhood.c <- var_lhood_N( sim, par.to.l(l.mle.c), lags, cond=TRUE )
     v.lhood.t <- c( v.lhood.t, 2 * ( lhood.c - lhood.u ) )
-        # The likelihood ratio test
+        # The conditional likelihood ratio test
+    l.mle.uc.c <- var.mle.rest( sim, g, lags, par=par.to.l(l.mle.uc), theta=thet-offset,
+                                cond=FALSE )
+    lhood.uc <- var_lhood_N( sim, par.to.l(l.mle.uc.c), lags, cond=FALSE )
+    v.lhood.uc <- c( v.lhood.uc, 2 * ( lhood.uc - lhood.u.uc ) )
+        # The unconditional likelihood ratio test
   }
 
-  plot( v.theta, v.wald.t, type='l', lwd=2, col='blue',
-        xlab=expression(theta), ylab='Test statistic' )
-  lines( v.theta, v.lhood.t, lwd=2, col='red' )
+  if(is.null(xlab)) xlab <- expression(theta)
+  plot( v.theta, v.wald.t, type='l', lwd=2, col='blue', lty=2,
+        xlab=xlab, ylab='Test statistic',
+        ylim=c(0, max( 1.3 * max(crit.vals), min( 2 * max(crit.vals), max( v.wald.uc ) ) ) ) )
+  lines( v.theta, v.wald.uc, lwd=2, col='blue' )
+  lines( v.theta, v.lhood.t, lwd=2, col='red', lty=2 )
+  lines( v.theta, v.lhood.uc, lwd=2, col='red' )
   abline(h=crit.vals, lty=2)
-  text( .8*max(v.theta), crit.vals, paste0( 'p-value = ', p.vals ), pos = 3,
-        offset=0.1, adj=c(0,0)  )
-  legend( 'topleft', c('Wald', 'Likelihood ratio'), col=c('blue', 'red'), lwd=2, bty='n')
+  text( min(v.theta)+.1*abs(diff(range(v.theta))), crit.vals, paste0( 'p-value = ', p.vals ),
+        pos = 3, offset=0.2, adj=c(0,0)  )
+  legend( 'topleft', c('Unconditional Wald', 'Conditional Wald',
+                       'Unconditional likelihood ratio', 'Conditional likelihood ratio'),
+          col=c('blue','blue', 'red', 'red'), lty=c(1,2), lwd=2, bty='n')
 
 }
 
