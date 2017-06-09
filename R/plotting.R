@@ -138,7 +138,7 @@ err.plot <- function( sim,  lags=1, l.var=NULL, x.vals=NULL, smooth=TRUE, n.pds=
 }
 
 lr.wald.plot <- function( sim, lags, g, v.theta, offset=0, xlab=NULL,
-                          p.vals=c(.9, .95, .975, .99, .995 ), ... ){
+                          p.vals=c(.9, .95, .975, .99, .995 ), drop=NULL, ... ){
 # Plots the Wald and LR test as a function of a constraint defined by theta
   n.var <- nrow(sim)
       # Problem dimensions
@@ -178,8 +178,13 @@ lr.wald.plot <- function( sim, lags, g, v.theta, offset=0, xlab=NULL,
         xlab=xlab, ylab='Test statistic',
         ylim=c(0, max( 1.3 * max(crit.vals), min( 2 * max(crit.vals), max( v.wald.uc ) ) ) ) )
   lines( v.theta, v.wald.uc, lwd=2, col='blue' )
+  v.lhood.t[v.lhood.t <= -1e-05] <- NA
   lines( v.theta, v.lhood.t, lwd=2, col='red', lty=2 )
-  lines( v.theta, v.lhood.uc, lwd=2, col='red' )
+  if( is.null(drop) ){
+    lines( v.theta, v.lhood.uc, lwd=2, col='red' )
+  }else{
+    lines( v.theta[-drop], v.lhood.uc[-drop], lwd=2, col='red' )
+  }
   abline(h=crit.vals, lty=2)
   text( min(v.theta)+.1*abs(diff(range(v.theta))), crit.vals, paste0( 'p-value = ', p.vals ),
         pos = 3, offset=0.2, adj=c(0,0)  )

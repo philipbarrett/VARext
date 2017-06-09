@@ -42,8 +42,8 @@ var.disc.1.i <- function( l.var, X, i, m.i=NULL, w=NULL ){
 # target moments of a 1-lag VAR
   a <- l.var$a ; A <- l.var$A ; Sigma <- l.var$Sigma
       # Extract VAR coefficients
-  n.m <- nrow(X)
-      # Number of points
+  n.var <- length(a) ; lags <- ncol(A) / n.var          # Problem dimensions
+  n.m <- nrow(X)                                        # Number of points
   # if( is.null(m.i) ) m.i <- rep( 1/ n.m, n.m )
   if(class(X)!='matrix') X <- as.matrix(X)
       # SOmetimes need as X can get converted to dataframe in higher functions
@@ -121,13 +121,13 @@ var.disc.lag <- function( l.var, X, M=NULL, w=NULL ){
 # lag are identical
 
   a <- l.var$a ; A <- l.var$A ; Sigma <- l.var$Sigma      # Extract VAR coefficients
-  n.vars <- length(a) ; lags <- ncol(A) / n.vars          # Problem dimensions
+  n.var <- length(a) ; lags <- ncol(A) / n.var          # Problem dimensions
   l.var.cpy <- l.var                                      # Make  copy of the VAR
-  l.var.cpy$a <- c( a + A[,-(1:n.vars)] %*% t(X[1,-(1:n.vars)]) )
-  l.var.cpy$A <- A[,1:n.vars]
+  l.var.cpy$a <- c( a + A[,-(1:n.var)] %*% t(X[1,-(1:n.var)]) )
+  l.var.cpy$A <- A[,1:n.var]
       # Adjust a & A to account for the change in the prediction due to the lags
       # before period t-1
-  disc <- var.disc.1( l.var.cpy, X[,1:n.vars], M, w )
+  disc <- var.disc.1( l.var.cpy, X[,1:n.var], M, w )
       # The discretization
   return(disc)
 }
@@ -136,10 +136,8 @@ var.disc.trans <- function( l.var, X, M=NULL, w = NULL ){
 # Puts the discretiation of the lagged process in the grand transition matrix
 
   n.pts <- nrow(X)                                        # Number of points (total)
-  a <- l.var$a ; A <- l.var$A ; Sigma <- l.var$Sigma
-      # Extract VAR coefficients
-  n.vars <- length(a) ; lags <- ncol(A) / n.vars
-      # Problem dimensions
+  a <- l.var$a ; A <- l.var$A ; Sigma <- l.var$Sigma      # Extract VAR coefficients
+  n.var <- length(a) ; lags <- ncol(A) / n.var            # Problem dimensions
   lag.idx <- as.integer(factor(apply(X[,-(1:n.var)], 1, toString)))
       # Index of lags
   # new.idx <- as.integer(factor(apply(X[,-(n.var*(lags-1)+1:n.var)], 1, toString)))
@@ -154,7 +152,7 @@ var.disc.trans <- function( l.var, X, M=NULL, w = NULL ){
     M <- l.disc[[i]]$M
     for( j in 1:nrow(Z) ){
       for( k in 1:ncol(M) ){
-        target <- c( Z[k,1:n.vars], Z[j,-((lags-1)*n.vars+1:n.vars)] )
+        target <- c( Z[k,1:n.var], Z[j,-((lags-1)*n.var+1:n.var)] )
             # The target to match
         match.idx <- which( apply( X, 1, function(x) all(x==target) ) )
             # The index of the match
@@ -169,10 +167,8 @@ var.disc.trans <- function( l.var, X, M=NULL, w = NULL ){
 
 var.disc <- function( l.var, n.pts, n.dirs, n.min.pts=5, lb=NULL, p.min=1e-05 ){
 # Discretizes a VAR
-  a <- l.var$a ; A <- l.var$A ; Sigma <- l.var$Sigma
-      # Extract VAR coefficients
-  n.vars <- length(a) ; lags <- ncol(A) / n.vars
-      # Problem dimensions
+  a <- l.var$a ; A <- l.var$A ; Sigma <- l.var$Sigma          # Extract VAR coefficients
+  n.var <- length(a) ; lags <- ncol(A) / n.var                # Problem dimensions
 
   #### Create nodes ####
   X <- var.disc.pts(l.var, lags, n.pts, n.dirs, lb )
@@ -190,7 +186,8 @@ var.disc <- function( l.var, n.pts, n.dirs, n.min.pts=5, lb=NULL, p.min=1e-05 ){
   }
   trans <- M / apply( M, 1, sum )
       # Regularize the probabilties just in case
-  return( list( X=X, trans=trans, n.X=n.X.new ) )
+
+  return( list( X=X, trans=trans, n.X=n.X.new, p.lr=p.lr ) )
 }
 
 
@@ -349,27 +346,31 @@ ls.min <- function(x, y) {
   return(b.min)
 }
 
-# var.data.interp <- function( l.var, dta, plot.on=TRUE ){
-# # Interprets data as values from a VAR and plots the corresponding series
-#   s.idx <- nn2( l.var$X, dta[,c('gth','rfr')], 1)$nn.idx
-#   dta.disc <- data.frame(l.var$X[s.idx,])
-#   colnames(dta.disc) <- c('gth','rfr')
-#       # Create the nearest neighbours
-#   if(plot.on){
-#     par.dft <- par('mar')
-#     par(mfrow=c(2,1), mar=c(3,3,3,3))
-#     plot(dta$date, dta$gth, type='l', lwd=2, main='Nominal GDP growth', xlab='', ylab='' )
-#     lines(dta$date, dta.disc$gth, col='blue', lwd=1 )
-#     abline(h=0, lwd=.5)
-#     plot(dta$date, dta$rfr, type='l', lwd=2, main='Nominal interest rate', xlab='', ylab='' )
-#     lines(dta$date, dta.disc$rfr, col='blue', lwd=1 )
-#     abline(h=0, lwd=.5)
-#     par(mfrow=c(1,1), mar=par.dft)
-#
-#     plot(dta$date, dta$rfr - dta$gth, type='l', lwd=2, main='Interest-growth differential', xlab='', ylab='' )
-#     lines(dta$date, dta.disc$rfr - dta.disc$gth, col='blue', lwd=1 )
-#     abline(h=0, lwd=.5)
-#   }
-#   return(list(s.idx=s.idx,dta.disc=dta.disc))
-# }
-#
+disc.data.interp <- function( disc, dta, plot.on=TRUE, v.date=NULL, mains=NULL ){
+# Interprets data as values from a VAR and plots the corresponding series
+  n.vars <- ncol(dta)
+  s.idx <- nn2( disc$X[,1:n.vars], dta, 1)$nn.idx
+  dta.disc <- data.frame(disc$X[s.idx,])
+      # Create the nearest neighbours
+
+  if(plot.on){
+    if(is.null(v.date)) v.date <- 1:nrow(dta.disc)
+    if(is.null(mains)) mains <- c( paste0( 'Variable ', 1:ncol(disc$X) ),
+                                   'Difference' )
+    par.dft <- par('mar')
+    par(mfrow=c(n.vars,1), mar=c(3,3,3,3))
+
+    for( i in 1:n.vars ){
+      plot(v.date, dta[,i], type='l', lwd=2, main=mains[i], xlab='', ylab='' )
+      lines(v.date, dta.disc[,i], col='blue', lwd=2 )
+      abline(h=0, lwd=.5)
+    }
+    par(mfrow=c(1,1), mar=par.dft)
+
+    plot(v.date, dta[,2] - dta[,1], type='l', lwd=2, main=mains[3], xlab='', ylab='' )
+    lines(v.date, dta.disc[,2] - dta.disc[,1], col='blue', lwd=2 )
+    abline(h=0, lwd=.5)
+  }
+  return(list(s.idx=s.idx,dta.disc=dta.disc))
+}
+

@@ -10,7 +10,8 @@
 
 var.table <- function( l.l.var, l.m.var=NULL, file=NULL, varnames=NULL,
                        specnames = NULL, label=NULL, caption=NULL, footer=TRUE,
-                       add.mean=TRUE, start=NULL, end=NULL, v.lhood=NULL ){
+                       add.mean=TRUE, start=NULL, end=NULL, v.lhood=NULL,
+                       font.size=NULL){
 # Creates a nice regression table for the VARs
 
   ### Set up ###
@@ -23,10 +24,11 @@ var.table <- function( l.l.var, l.m.var=NULL, file=NULL, varnames=NULL,
   if( is.null(specnames) ) specnames <- paste0( '(', 1:n.spec, ')' )
   l.mu <- lapply( l.l.var, function(x) mu.calc( x$a, x$A ) )
       # The mean (in case not provided)
+  st.font.size <- if( is.null(font.size) ) NULL else paste0('\n\t \\', font.size)
 
   ###  Create top and tail ###
-  head.str <- paste0( '\\begin{table}[htbp] \n\t\\centering \n\t\\begin{tabular}{',
-                      '@{\\extracolsep{4pt}}',
+  head.str <- paste0( '\\begin{table}[htbp] \n\t\\centering', st.font.size,
+                      '\n\t\\begin{tabular}{@{\\extracolsep{4pt}}',
                       paste( c( 'l', rep('c', n.col-1) ), collapse ='' ), '@{}}' )
   header.spec <- paste0( '\t\t\\hline\\hline\n\t\t \t\t & ',
                     paste0( sapply( specnames,
@@ -82,7 +84,7 @@ var.table <- function( l.l.var, l.m.var=NULL, file=NULL, varnames=NULL,
 
   ### Mean rows ###
   if( add.mean ){
-    mn <- paste0( '\\quad Mean \t & ',
+    mn <- paste0( '\\quad LR Mean \t & ',
                    paste0( c( sapply(l.mu, function(x) round( x, 2 ) ) ),
                            collapse=' \t & ' ), '\t \\\\ \n' )
     if( add.se )
@@ -110,7 +112,7 @@ var.table <- function( l.l.var, l.m.var=NULL, file=NULL, varnames=NULL,
   coeff <- paste0( coeff.title, const, mn, dyn.coeff )
 
   ### The covariances ###
-  cov.title <- paste0( '\\rule{0pt}{4ex} \\emph{Innovation covariance} ',
+  cov.title <- paste0( '\\rule{0pt}{4ex} \\emph{Innov. covar.} ',
                          paste0( rep(' \t &', n.col-1 ), collapse='' ), '\\\\ \n' )
   idx <- lower.tri(l.l.var[[1]]$Sigma, TRUE )
   l.cov.st <- lapply( l.l.var, function(x) toString(x$Sigma) )

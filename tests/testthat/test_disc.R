@@ -1,5 +1,5 @@
 library(VARext)
-context("Test the discretization")
+context("Test the discretization objective function")
 
 test_that("Single lag initial guess", {
 
@@ -17,12 +17,12 @@ test_that("Single lag initial guess", {
       # The grid of points
   M <- t(sapply( 1:nrow(X)-1, function(i) M_i_ig( X, i, a, A, Sigma ) ))
       # Create the initial transition probabilities
-  f.0 <- disc_obj( M, X, 0, a, A, Sigma, rep(1,7) )
+  f.0 <- disc_obj( M[1,], X, 0, a, A, Sigma, rep(1,7) )
       # objective function
 
-  expect_equal( sapply(M,1,sum), rep(1,nrow(X)) )
-  expect_equal( M %*% X, ar_cm(X, a, A ) )
-  for( i in 1:nrow(X) ) expext_equal( disc_cv(X,M)[,i], Sigma[lower.tri(Sigma,TRUE)] )
+  expect_equal( apply(M,1,sum), rep(1,nrow(X)) )
+  expect_equal( M %*% X, var_cm(X, a, A ) )
+  for( i in 1:nrow(X) ) expect_equal( disc_cv(X,M)[,i], Sigma[lower.tri(Sigma,TRUE)] )
       # Check initial guesses are ok
   expect_equal( f.0, 0 )
       # Objective function should be near zero
@@ -33,5 +33,5 @@ test_that("Single lag initial guess", {
       # Create & check derivatives
   cc <- check.derivatives( c(M[1,]), fn, grad, check_derivatives_print = 'none' )
       # Create numerical derivatives
-  expect_true( max(abs(cc$relative_error)) < 1-06 )
+  expect_true( max(abs(cc$relative_error)) < 5e-06 )
 } )
